@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>내 포트폴리오 대시보드</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<style>
+  :root{
+    --bg:#f4f1ea;
+    --panel:#fffdf8;
+    --ink:#1a1a17;
+    --ink-soft:#5b5852;
+    --line:#e6e0d4;
+    --accent:#0f6b54;
+    --accent-soft:#e3efe9;
+    --c-us:#2563b8;
+    --c-semi:#d4881f;
+    --c-kr:#2f9e6e;
+    --c-bond:#8a6dbf;
+    --c-cash:#9aa0a6;
+    --shadow:0 1px 2px rgba(40,35,25,.04), 0 8px 28px rgba(40,35,25,.06);
+    --radius:16px;
+    font-family:"Pretendard","Pretendard Variable",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;padding:28px 18px 80px}
+  .wrap{max-width:1080px;margin:0 auto}
+
+  /* Header */
+  header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:26px}
+  .title-block .eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:6px}
+  .title-block h1{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .total-block{text-align:right}
+  .total-block .label{font-size:12px;color:var(--ink-soft);font-weight:600;letter-spacing:.05em}
+  .total-block .amount{font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1.05;font-variant-numeric:tabular-nums}
+  .total-block .amount small{font-size:18px;font-weight:700;color:var(--ink-soft)}
+  .save-tag{font-size:11px;color:var(--ink-soft);margin-top:4px;opacity:.7}
+
+  /* Summary cards */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}
+  .card .k{font-size:12px;color:var(--ink-soft);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:7px}
+  .card .v{font-size:24px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .card .sub{font-size:12px;color:var(--ink-soft);margin-top:3px}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+
+  /* Layout */
+  .grid2{display:grid;grid-template-columns:1.1fr 1fr;gap:14px;margin-bottom:14px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
+  .panel h2{font-size:15px;font-weight:800;margin-bottom:2px;letter-spacing:-.01em}
+  .panel .desc{font-size:12px;color:var(--ink-soft);margin-bottom:18px}
+
+  /* Donut */
+  .donut-row{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+  .donut{width:170px;height:170px;border-radius:50%;flex-shrink:0;position:relative;display:grid;place-items:center}
+  .donut::after{content:"";position:absolute;inset:26px;background:var(--panel);border-radius:50%}
+  .donut .center{position:relative;z-index:1;text-align:center}
+  .donut .center .big{font-size:15px;font-weight:800}
+  .donut .center .small{font-size:11px;color:var(--ink-soft)}
+  .legend{flex:1;min-width:200px;display:flex;flex-direction:column;gap:9px}
+  .leg-item{display:flex;align-items:center;gap:10px;font-size:13px}
+  .leg-item .name{flex:1;font-weight:600}
+  .leg-item .pct{font-weight:800;font-variant-numeric:tabular-nums}
+  .leg-item .amt{color:var(--ink-soft);font-size:12px;min-width:78px;text-align:right;font-variant-numeric:tabular-nums}
+
+  /* Insight */
+  .insight{background:var(--accent-soft);border:1px solid #cde3d9;border-radius:var(--radius);padding:18px 20px;margin-bottom:24px;font-size:13.5px;color:#0c4636;line-height:1.65}
+  .insight b{font-weight:800}
+
+  /* Account editor */
+  .acct{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow);margin-bottom:14px}
+  .acct-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+  .acct-head .left{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .acct-name{font-size:17px;font-weight:800;border:none;background:transparent;color:var(--ink);width:auto;min-width:60px;padding:2px 4px;border-radius:6px}
+  .acct-name:focus{outline:none;background:#f3efe6}
+  .acct-total{font-size:14px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+  .mini-bar{height:6px;border-radius:4px;background:#eee7d9;overflow:hidden;display:flex;margin-bottom:14px}
+  .mini-bar span{height:100%}
+
+  table{width:100%;border-collapse:collapse}
+  th{font-size:11px;color:var(--ink-soft);font-weight:600;text-align:left;padding:0 8px 8px;letter-spacing:.03em}
+  th.r,td.r{text-align:right}
+  td{padding:5px 8px;border-top:1px solid #f0ebe0;vertical-align:middle}
+  .inp{border:1px solid transparent;background:transparent;font-size:13.5px;color:var(--ink);padding:7px 9px;border-radius:8px;font-family:inherit;width:100%}
+  .inp:hover{background:#f7f3ec}
+  .inp:focus{outline:none;background:#fff;border-color:var(--accent)}
+  .inp.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+  select.inp{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235b5852' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:24px}
+  .cat-tag{display:inline-flex;align-items:center;gap:6px}
+  .pct-cell{font-size:12px;color:var(--ink-soft);font-variant-numeric:tabular-nums;min-width:44px;text-align:right}
+  .del{border:none;background:transparent;color:#c0392b;cursor:pointer;font-size:16px;line-height:1;padding:6px 8px;border-radius:8px;opacity:.45}
+  .del:hover{opacity:1;background:#fbeae8}
+  .add-row{margin-top:8px}
+  .btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);font-family:inherit;font-size:13px;font-weight:700;padding:9px 14px;border-radius:10px;cursor:pointer;transition:.12s}
+  .btn:hover{background:#f3efe6;border-color:#d8d0c0}
+  .btn.ghost{border-style:dashed;color:var(--ink-soft);width:100%}
+  .btn.ghost:hover{color:var(--accent);border-color:var(--accent)}
+  .btn.accent{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .btn.accent:hover{background:#0c5743}
+  .footer-actions{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap}
+
+  @media(max-width:780px){
+    .cards{grid-template-columns:1fr}
+    .grid2{grid-template-columns:1fr}
+    .total-block{text-align:left}
+    header{flex-direction:column;align-items:flex-start}
+    .total-block .amount{font-size:34px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="title-block">
+      <div class="eyebrow">My Portfolio</div>
+      <h1>통합 자산 대시보드</h1>
+    </div>
+    <div class="total-block">
+      <div class="label">총 자산</div>
+      <div class="amount" id="totalAmt">–</div>
+      <div class="save-tag" id="saveTag">자동 저장됨</div>
+    </div>
+  </header>
+
+  <div class="cards" id="summaryCards"></div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h2>통합 자산배분</h2>
+      <p class="desc">4개 계좌를 합쳐 실제 노출 비중으로 본 그림</p>
+      <div class="donut-row">
+        <div class="donut" id="catDonut"><div class="center"><div class="big" id="catEquityPct">–</div><div class="small">주식 비중</div></div></div>
+        <div class="legend" id="catLegend"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>계좌별 비중</h2>
+      <p class="desc">어느 계좌에 자산이 모여 있는지</p>
+      <div class="donut-row">
+        <div class="donut" id="acctDonut"><div class="center"><div class="big" id="acctCount">–</div><div class="small">개 계좌</div></div></div>
+        <div class="legend" id="acctLegend"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight" id="insight"></div>
+
+  <div id="accounts"></div>
+
+  <div class="footer-actions">
+    <button class="btn ghost" id="addAcct">+ 계좌 추가</button>
+    <button class="btn" id="resetBtn">초기값으로 되돌리기</button>
+  </div>
+</div>
+
+<script>
+const CATS = {
+  "미국지수":   {color:"var(--c-us)",   hex:"#2563b8"},
+  "반도체/AI":  {color:"var(--c-semi)", hex:"#d4881f"},
+  "한국주식":   {color:"var(--c-kr)",   hex:"#2f9e6e"},
+  "채권":       {color:"var(--c-bond)", hex:"#8a6dbf"},
+  "현금성":     {color:"var(--c-cash)", hex:"#9aa0a6"}
+};
+const CAT_KEYS = Object.keys(CATS);
+const ACCT_COLORS = ["#0f6b54","#c98a2b","#3a6ea5","#9d5ca8"];
+const DEFAULT_DATA = {accounts:[
+  {name:"IRP", holdings:[
+    {name:"나스닥100", amount:420, cat:"미국지수"},
+    {name:"30년채권", amount:180, cat:"채권"}]},
+  {name:"연금저축", holdings:[
+    {name:"S&P500", amount:1904, cat:"미국지수"},
+    {name:"나스닥100", amount:476, cat:"미국지수"}]},
+  {name:"ISA", holdings:[
+    {name:"ACE 엔비디아밸류체인액티브", amount:3150, cat:"반도체/AI"},
+    {name:"CD금리형", amount:1050, cat:"현금성"}]},
+  {name:"일반계좌", holdings:[
+    {name:"삼성증권", amount:250, cat:"한국주식"},
+    {name:"SK텔레콤", amount:150, cat:"한국주식"},
+    {name:"삼성생명", amount:77.6, cat:"한국주식"},
+    {name:"현대모비스", amount:77.6, cat:"한국주식"},
+    {name:"삼양식품", amount:122, cat:"한국주식"},
+    {name:"한화에어로스페이스", amount:117, cat:"한국주식"},
+    {name:"현금/CD금리형", amount:482.8, cat:"현금성"}]}
+]};
+const KEY = "portfolio_data_v1";
+
+/* ---- storage: window.storage (claude.ai) → localStorage (배포 시) → 메모리 ---- */
+const mem = {};
+const Store = {
+  async get(k){
+    if (window.storage){ try{const r=await window.storage.get(k,false);return r?r.value:null}catch{return null} }
+    try{return localStorage.getItem(k)}catch{return mem[k]??null}
+  },
+  async set(k,v){
+    if (window.storage){ try{await window.storage.set(k,v,false);return}catch{} }
+    try{localStorage.setItem(k,v)}catch{mem[k]=v}
+  }
+};
+
+let data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+
+const fmt = n => Math.round(n).toLocaleString("ko-KR");
+const fmt1 = n => (Math.round(n*10)/10).toLocaleString("ko-KR");
+
+async function save(){
+  await Store.set(KEY, JSON.stringify(data));
+  const t=document.getElementById("saveTag");
+  t.textContent="저장됨 ✓"; t.style.opacity=".9";
+  clearTimeout(window._st); window._st=setTimeout(()=>{t.style.opacity=".7";t.textContent="자동 저장됨"},1200);
+}
+
+function totals(){
+  let total=0; const byCat={}, byAcct=[];
+  CAT_KEYS.forEach(c=>byCat[c]=0);
+  data.accounts.forEach(a=>{
+    let at=0; a.holdings.forEach(h=>{const v=+h.amount||0; at+=v; byCat[h.cat]=(byCat[h.cat]||0)+v});
+    byAcct.push({name:a.name,total:at}); total+=at;
+  });
+  return {total,byCat,byAcct};
+}
+
+function donutGradient(parts,total){
+  // parts: [{value,color}]
+  let acc=0, stops=[];
+  parts.forEach(p=>{
+    const start=total? acc/total*360:0;
+    acc+=p.value;
+    const end=total? acc/total*360:0;
+    stops.push(`${p.color} ${start}deg ${end}deg`);
+  });
+  if(!stops.length) stops.push("#eee 0deg 360deg");
+  return `conic-gradient(${stops.join(",")})`;
+}
+
+function render(){
+  const {total,byCat,byAcct}=totals();
+
+  // total
+  document.getElementById("totalAmt").innerHTML = `${fmt(total)}<small>만 원</small>`;
+
+  // summary cards
+  const equity = byCat["미국지수"]+byCat["반도체/AI"]+byCat["한국주식"];
+  const safe = byCat["채권"]+byCat["현금성"];
+  const semi = byCat["반도체/AI"];
+  const pct = v => total? (v/total*100):0;
+  document.getElementById("summaryCards").innerHTML = `
+    <div class="card"><div class="k"><span class="dot" style="background:var(--c-kr)"></span>주식 비중</div>
+      <div class="v">${pct(equity).toFixed(1)}%</div><div class="sub">${fmt(equity)}만 원</div></div>
+    <div class="card"><div class="k"><span class="dot" style="background:var(--c-cash)"></span>안전자산(채권+현금)</div>
+      <div class="v">${pct(safe).toFixed(1)}%</div><div class="sub">${fmt(safe)}만 원</div></div>
+    <div class="card"><div class="k"><span class="dot" style="background:var(--c-semi)"></span>반도체/AI 단일테마</div>
+      <div class="v">${pct(semi).toFixed(1)}%</div><div class="sub">${fmt(semi)}만 원</div></div>`;
+
+  // category donut
+  const catParts = CAT_KEYS.filter(c=>byCat[c]>0).map(c=>({value:byCat[c],color:CATS[c].hex}));
+  document.getElementById("catDonut").style.background = donutGradient(catParts,total);
+  document.getElementById("catEquityPct").textContent = pct(equity).toFixed(0)+"%";
+  document.getElementById("catLegend").innerHTML = CAT_KEYS.filter(c=>byCat[c]>0).map(c=>`
+    <div class="leg-item"><span class="dot" style="background:${CATS[c].hex}"></span>
+      <span class="name">${c}</span><span class="amt">${fmt(byCat[c])}만</span>
+      <span class="pct">${pct(byCat[c]).toFixed(1)}%</span></div>`).join("");
+
+  // account donut
+  const acctParts = byAcct.map((a,i)=>({value:a.total,color:ACCT_COLORS[i%ACCT_COLORS.length]}));
+  document.getElementById("acctDonut").style.background = donutGradient(acctParts,total);
+  document.getElementById("acctCount").textContent = data.accounts.length;
+  document.getElementById("acctLegend").innerHTML = byAcct.map((a,i)=>`
+    <div class="leg-item"><span class="dot" style="background:${ACCT_COLORS[i%ACCT_COLORS.length]}"></span>
+      <span class="name">${a.name}</span><span class="amt">${fmt(a.total)}만</span>
+      <span class="pct">${pct(a.total).toFixed(1)}%</span></div>`).join("");
+
+  // insight
+  const semiPct=pct(semi), usPct=pct(byCat["미국지수"]), techCombined=pct(semi+byCat["미국지수"]);
+  document.getElementById("insight").innerHTML =
+    `💡 계좌는 4개로 나뉘어 있지만 실제 노출은 한쪽에 쏠려 있습니다. `+
+    `<b>미국지수 ${usPct.toFixed(0)}% + 반도체/AI ${semiPct.toFixed(0)}%</b>를 합치면 `+
+    `포트폴리오의 <b>약 ${techCombined.toFixed(0)}%가 미국·반도체 중심 성장주</b>에 묶여 있습니다. `+
+    `안전자산(채권+현금)은 ${pct(safe).toFixed(0)}% 수준이라, 리밸런싱을 볼 땐 계좌 단위가 아니라 이 통합 비중을 기준으로 판단하시면 됩니다.`;
+
+  // accounts editor
+  const wrap=document.getElementById("accounts");
+  wrap.innerHTML="";
+  data.accounts.forEach((a,ai)=>{
+    const at=byAcct[ai].total;
+    const bar = a.holdings.filter(h=>(+h.amount||0)>0).map(h=>
+      `<span style="width:${at?((+h.amount||0)/at*100):0}%;background:${CATS[h.cat]?.hex||'#ccc'}"></span>`).join("");
+    const rows = a.holdings.map((h,hi)=>`
+      <tr>
+        <td><input class="inp" value="${escapeHtml(h.name)}" data-a="${ai}" data-h="${hi}" data-f="name"></td>
+        <td>${catSelect(h.cat,ai,hi)}</td>
+        <td class="r"><input class="inp num" type="number" step="0.1" value="${h.amount}" data-a="${ai}" data-h="${hi}" data-f="amount" style="width:110px"></td>
+        <td class="r"><span class="pct-cell">${at?((+h.amount||0)/at*100).toFixed(1):0}%</span></td>
+        <td class="r"><button class="del" data-a="${ai}" data-h="${hi}" data-act="delH" title="삭제">×</button></td>
+      </tr>`).join("");
+    const card=document.createElement("div");
+    card.className="acct";
+    card.innerHTML=`
+      <div class="acct-head">
+        <div class="left">
+          <input class="acct-name" value="${escapeHtml(a.name)}" data-a="${ai}" data-f="acctname">
+          <span class="acct-total">${fmt1(at)}만 원 · ${pct(at).toFixed(1)}%</span>
+        </div>
+        <button class="del" data-a="${ai}" data-act="delA" title="계좌 삭제" style="font-size:13px;opacity:.5">계좌 삭제</button>
+      </div>
+      <div class="mini-bar">${bar}</div>
+      <table>
+        <thead><tr><th>종목</th><th>분류</th><th class="r">금액(만원)</th><th class="r">비중</th><th></th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div class="add-row"><button class="btn ghost" data-a="${ai}" data-act="addH">+ 종목 추가</button></div>`;
+    wrap.appendChild(card);
+  });
+}
+
+function catSelect(val,ai,hi){
+  return `<select class="inp" data-a="${ai}" data-h="${hi}" data-f="cat">`+
+    CAT_KEYS.map(c=>`<option ${c===val?"selected":""}>${c}</option>`).join("")+`</select>`;
+}
+function escapeHtml(s){return String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]))}
+
+/* events (delegated) */
+document.addEventListener("input",e=>{
+  const t=e.target; const f=t.dataset.f;
+  if(!f) return;
+  const ai=+t.dataset.a;
+  if(f==="acctname"){ data.accounts[ai].name=t.value; }
+  else{
+    const hi=+t.dataset.h, h=data.accounts[ai].holdings[hi];
+    if(f==="name") h.name=t.value;
+    else if(f==="amount") h.amount=parseFloat(t.value)||0;
+    else if(f==="cat") h.cat=t.value;
+  }
+  scheduleRender();
+});
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-act]");
+  if(!t) return;
+  const act=t.dataset.act, ai=+t.dataset.a;
+  if(act==="addH") data.accounts[ai].holdings.push({name:"새 종목",amount:0,cat:"현금성"});
+  else if(act==="delH") data.accounts[ai].holdings.splice(+t.dataset.h,1);
+  else if(act==="delA"){ if(confirm("이 계좌를 삭제할까요?")) data.accounts.splice(ai,1); else return; }
+  render(); save();
+});
+document.getElementById("addAcct").onclick=()=>{
+  data.accounts.push({name:"새 계좌",holdings:[{name:"현금",amount:0,cat:"현금성"}]});
+  render(); save();
+};
+document.getElementById("resetBtn").onclick=()=>{
+  if(confirm("입력한 내용을 지우고 처음 값으로 되돌릴까요?")){
+    data=JSON.parse(JSON.stringify(DEFAULT_DATA)); render(); save();
+  }
+};
+
+let _rt;
+function scheduleRender(){ clearTimeout(_rt); _rt=setTimeout(()=>{ liveUpdate(); save(); },350); }
+// light update that doesn't steal focus from inputs: recompute summary/donuts/bars only
+function liveUpdate(){
+  const {total,byCat,byAcct}=totals();
+  document.getElementById("totalAmt").innerHTML=`${fmt(total)}<small>만 원</small>`;
+  const equity=byCat["미국지수"]+byCat["반도체/AI"]+byCat["한국주식"];
+  const pct=v=>total?(v/total*100):0;
+  // re-render full (acceptable; inputs reflect data). Keep focus.
+  const active=document.activeElement;
+  const sig=active&&active.dataset?`${active.dataset.a}-${active.dataset.h}-${active.dataset.f}`:null;
+  const selStart=active&&active.selectionStart;
+  render();
+  if(sig){
+    const el=document.querySelector(`[data-a="${active.dataset.a}"][data-h="${active.dataset.h||''}"][data-f="${active.dataset.f}"]`)
+          ||document.querySelector(`[data-a="${active.dataset.a}"][data-f="${active.dataset.f}"]`);
+    if(el){ el.focus(); try{el.setSelectionRange(selStart,selStart)}catch{} }
+  }
+}
+
+async function init(){
+  const saved=await Store.get(KEY);
+  if(saved){ try{data=JSON.parse(saved)}catch{} }
+  render();
+}
+init();
+</script>
+</body>
+</html>

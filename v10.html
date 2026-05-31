@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>내 포트폴리오 대시보드</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<style>
+  :root{
+    --bg:#f4f1ea;--panel:#fffdf8;--ink:#1a1a17;--ink-soft:#5b5852;--line:#e6e0d4;
+    --accent:#0f6b54;--accent-soft:#e3efe9;
+    --c-us:#2563b8;--c-semi:#d4881f;--c-kr:#2f9e6e;--c-bond:#8a6dbf;--c-cash:#9aa0a6;
+    --shadow:0 1px 2px rgba(40,35,25,.04),0 8px 28px rgba(40,35,25,.06);--radius:16px;
+    font-family:"Pretendard","Pretendard Variable",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;padding:28px 18px 80px}
+  .wrap{max-width:1080px;margin:0 auto}
+  header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:26px}
+  .title-block .eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:6px}
+  .title-block h1{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .total-block{text-align:right}
+  .total-block .label{font-size:12px;color:var(--ink-soft);font-weight:600;letter-spacing:.05em}
+  .total-block .amount{font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1.05;font-variant-numeric:tabular-nums}
+  .total-block .amount small{font-size:18px;font-weight:700;color:var(--ink-soft)}
+  .save-tag{font-size:11px;color:var(--ink-soft);margin-top:4px;opacity:.7}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}
+  .card .k{font-size:12px;color:var(--ink-soft);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:7px}
+  .card .v{font-size:24px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .card .sub{font-size:12px;color:var(--ink-soft);margin-top:3px}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+  .grid2{display:grid;grid-template-columns:1.1fr 1fr;gap:14px;margin-bottom:14px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
+  .panel h2{font-size:15px;font-weight:800;margin-bottom:2px;letter-spacing:-.01em}
+  .panel .desc{font-size:12px;color:var(--ink-soft);margin-bottom:18px}
+  .donut-row{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+  .donut{width:170px;height:170px;border-radius:50%;flex-shrink:0;position:relative;display:grid;place-items:center}
+  .donut::after{content:"";position:absolute;inset:26px;background:var(--panel);border-radius:50%}
+  .donut .center{position:relative;z-index:1;text-align:center}
+  .donut .center .big{font-size:15px;font-weight:800}
+  .donut .center .small{font-size:11px;color:var(--ink-soft)}
+  .legend{flex:1;min-width:200px;display:flex;flex-direction:column;gap:9px}
+  .leg-item{display:flex;align-items:center;gap:10px;font-size:13px}
+  .leg-item .name{flex:1;font-weight:600}
+  .leg-item .pct{font-weight:800;font-variant-numeric:tabular-nums}
+  .leg-item .amt{color:var(--ink-soft);font-size:12px;min-width:78px;text-align:right;font-variant-numeric:tabular-nums}
+  .insight{background:var(--accent-soft);border:1px solid #cde3d9;border-radius:var(--radius);padding:18px 20px;margin-bottom:24px;font-size:13.5px;color:#0c4636;line-height:1.65}
+  .insight b{font-weight:800}
+  .acct{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow);margin-bottom:14px}
+  .acct-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+  .acct-head .left{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .acct-name{font-size:17px;font-weight:800;border:none;background:transparent;color:var(--ink);min-width:60px;padding:2px 4px;border-radius:6px}
+  .acct-name:focus{outline:none;background:#f3efe6}
+  .acct-total{font-size:14px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+  .mini-bar{height:6px;border-radius:4px;background:#eee7d9;overflow:hidden;display:flex;margin-bottom:14px}
+  .mini-bar span{height:100%}
+  table{width:100%;border-collapse:collapse}
+  th{font-size:11px;color:var(--ink-soft);font-weight:600;text-align:left;padding:0 8px 8px;letter-spacing:.03em}
+  th.r,td.r{text-align:right}
+  td{padding:5px 8px;border-top:1px solid #f0ebe0;vertical-align:middle}
+  .inp{border:1px solid transparent;background:transparent;font-size:13.5px;color:var(--ink);padding:7px 9px;border-radius:8px;font-family:inherit;width:100%}
+  .inp:hover{background:#f7f3ec}
+  .inp:focus{outline:none;background:#fff;border-color:var(--accent)}
+  .inp.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+  select.inp{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235b5852' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:24px}
+  .pct-cell{font-size:12px;color:var(--ink-soft);font-variant-numeric:tabular-nums;min-width:44px;text-align:right}
+  .del{border:none;background:transparent;color:#c0392b;cursor:pointer;font-size:16px;line-height:1;padding:6px 8px;border-radius:8px;opacity:.45}
+  .del:hover{opacity:1;background:#fbeae8}
+  .add-row{margin-top:8px;display:flex;gap:8px}
+  .btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);font-family:inherit;font-size:13px;font-weight:700;padding:9px 14px;border-radius:10px;cursor:pointer;transition:.12s}
+  .btn:hover{background:#f3efe6;border-color:#d8d0c0}
+  .btn.ghost{border-style:dashed;color:var(--ink-soft);flex:1}
+  .btn.ghost:hover{color:var(--accent);border-color:var(--accent)}
+  .btn.accent{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .btn.accent:hover{background:#0c5743}
+  .btn.ai{background:#1a1a17;color:#fff;border-color:#1a1a17;display:flex;align-items:center;gap:7px}
+  .btn.ai:hover{background:#333}
+  .footer-actions{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap}
+
+  /* ── MODALS ── */
+  .overlay{position:fixed;inset:0;background:rgba(20,18,14,.55);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:center;justify-content:center;padding:18px}
+  .overlay.hidden{display:none}
+  .modal{background:var(--panel);border-radius:20px;padding:28px;width:100%;max-width:480px;box-shadow:0 24px 60px rgba(0,0,0,.18);position:relative}
+  .modal h3{font-size:18px;font-weight:800;margin-bottom:6px}
+  .modal p{font-size:13.5px;color:var(--ink-soft);margin-bottom:20px;line-height:1.6}
+  .modal-close{position:absolute;top:16px;right:16px;border:none;background:transparent;font-size:20px;cursor:pointer;color:var(--ink-soft);line-height:1;padding:4px 8px;border-radius:8px}
+  .modal-close:hover{background:#f0ebe0}
+  .field{margin-bottom:16px}
+  .field label{font-size:12px;font-weight:700;color:var(--ink-soft);display:block;margin-bottom:6px;letter-spacing:.04em}
+  .field input{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14px;font-family:inherit;background:#fff;color:var(--ink)}
+  .field input:focus{outline:none;border-color:var(--accent)}
+  .drop-zone{border:2px dashed var(--line);border-radius:14px;padding:32px 20px;text-align:center;cursor:pointer;transition:.15s;background:#faf8f3;position:relative}
+  .drop-zone:hover,.drop-zone.drag{border-color:var(--accent);background:var(--accent-soft)}
+  .drop-zone .icon{font-size:36px;margin-bottom:10px}
+  .drop-zone .main{font-size:14px;font-weight:700;margin-bottom:4px}
+  .drop-zone .sub{font-size:12px;color:var(--ink-soft)}
+  .drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+  .preview-img{width:100%;max-height:200px;object-fit:contain;border-radius:10px;margin:14px 0;border:1px solid var(--line)}
+  .spin{display:inline-block;width:20px;height:20px;border:2.5px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .parsed-list{display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto;margin-bottom:16px}
+  .parsed-item{display:grid;grid-template-columns:1fr auto auto auto;gap:6px;align-items:center;background:#f7f3ec;border-radius:10px;padding:10px 12px}
+  .parsed-item input{border:1px solid transparent;background:transparent;font-family:inherit;font-size:13px;color:var(--ink);padding:4px 6px;border-radius:6px;width:100%}
+  .parsed-item input:focus{outline:none;background:#fff;border-color:var(--accent)}
+  .parsed-item input.pamt{width:90px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+  .parsed-item select{border:1px solid var(--line);background:#fff;font-family:inherit;font-size:12px;padding:5px 8px;border-radius:6px;cursor:pointer}
+  .parsed-item .pdel{border:none;background:transparent;color:#c0392b;cursor:pointer;font-size:16px;opacity:.5;padding:2px 6px;border-radius:6px}
+  .parsed-item .pdel:hover{opacity:1;background:#fbeae8}
+  .key-hint{font-size:11px;color:var(--ink-soft);margin-top:8px;line-height:1.5}
+  .tag-key{display:inline-flex;align-items:center;gap:8px;background:var(--accent-soft);border:1px solid #cde3d9;border-radius:8px;padding:7px 12px;font-size:12px;color:#0c4636;margin-bottom:14px;width:100%}
+  .tag-key button{margin-left:auto;border:none;background:transparent;font-size:11px;color:#c0392b;cursor:pointer;font-weight:700;padding:2px 6px;border-radius:5px}
+  .tag-key button:hover{background:#fbeae8}
+  .error-box{background:#fbeae8;border:1px solid #f5c6c6;border-radius:10px;padding:12px 14px;font-size:13px;color:#8b1a1a;margin-bottom:14px;display:none}
+  #redactCanvas{max-height:320px;object-fit:contain}
+  .radio-group{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+  .radio-item{display:flex;align-items:center;gap:8px;font-size:13.5px;cursor:pointer;padding:8px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--panel);transition:.1s}
+  .radio-item:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+  .radio-item input{accent-color:var(--accent);cursor:pointer}
+  @media(max-width:780px){
+    .cards{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}
+    .total-block{text-align:left}header{flex-direction:column;align-items:flex-start}
+    .total-block .amount{font-size:34px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="title-block">
+      <div class="eyebrow">My Portfolio</div>
+      <h1>통합 자산 대시보드</h1>
+    </div>
+    <div class="total-block">
+      <div class="label">총 자산</div>
+      <div class="amount" id="totalAmt">–</div>
+      <div class="save-tag" id="saveTag">자동 저장됨</div>
+    </div>
+  </header>
+  <div class="cards" id="summaryCards"></div>
+  <div class="grid2">
+    <div class="panel">
+      <h2>통합 자산배분</h2>
+      <p class="desc">4개 계좌를 합쳐 실제 노출 비중으로 본 그림</p>
+      <div class="donut-row">
+        <div class="donut" id="catDonut"><div class="center"><div class="big" id="catEquityPct">–</div><div class="small">주식 비중</div></div></div>
+        <div class="legend" id="catLegend"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>계좌별 비중</h2>
+      <p class="desc">어느 계좌에 자산이 모여 있는지</p>
+      <div class="donut-row">
+        <div class="donut" id="acctDonut"><div class="center"><div class="big" id="acctCount">–</div><div class="small">개 계좌</div></div></div>
+        <div class="legend" id="acctLegend"></div>
+      </div>
+    </div>
+  </div>
+  <div class="insight-wrap" style="margin-bottom:24px">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <span style="font-size:13px;font-weight:700;color:var(--ink-soft)">💡 AI 포트폴리오 분석</span>
+      <button class="btn" id="profileBtn" style="font-size:12px;padding:6px 12px">👤 프로필 설정</button>
+    </div>
+    <button class="btn ai" id="analyzePortfolioBtn" style="font-size:13px;padding:8px 16px">✨ 분석하기</button>
+  </div>
+  <div id="profileTag" style="display:none;margin-bottom:10px"></div>
+  <div class="insight" id="insight">포트폴리오를 입력한 후 <b>분석하기</b> 버튼을 누르면 AI가 현재 배분을 분석해드려요.</div>
+</div>
+  <div id="accounts"></div>
+  <div class="footer-actions">
+    <button class="btn ghost" id="addAcct">+ 계좌 추가</button>
+    <button class="btn" id="resetBtn">초기값으로 되돌리기</button>
+  </div>
+</div>
+
+<!-- API Key Modal -->
+<div class="overlay hidden" id="keyModal">
+  <div class="modal">
+    <button class="modal-close" id="keyModalClose">✕</button>
+    <h3>🔑 Gemini API 키 입력</h3>
+    <p>이미지 분석 기능을 사용하려면 Google Gemini API 키가 필요해요. <b>무료</b>로 발급받을 수 있어요. 키는 이 브라우저에만 저장돼요.</p>
+    <div class="error-box" id="keyError"></div>
+    <div class="field">
+      <label>GEMINI API KEY</label>
+      <input type="password" id="keyInput" placeholder="API 키 붙여넣기" autocomplete="off">
+    </div>
+    <p class="key-hint">키 발급: <b>aistudio.google.com</b> → Get API key → Create API key<br>무료 플랜으로 충분해요. 한번 저장하면 다음부터 묻지 않아요.</p>
+    <div style="margin-top:20px;display:flex;gap:8px">
+      <button class="btn" style="flex:1" id="keyCancel">취소</button>
+      <button class="btn accent" style="flex:2" id="keySave">저장하고 계속</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI Upload Modal -->
+<div class="overlay hidden" id="uploadModal">
+  <div class="modal">
+    <button class="modal-close" id="uploadClose">✕</button>
+    <h3>🤖 AI 종목 분석</h3>
+    <p id="uploadAcctName" style="font-weight:700;color:var(--accent);margin-bottom:4px"></p>
+    <p>증권사 앱 캡처 이미지를 올리면 종목·금액을 자동으로 읽어줘요.</p>
+    <div id="keyStatusBar"></div>
+    <div class="drop-zone" id="dropZone">
+      <div class="icon">📷</div>
+      <div class="main">이미지를 클릭하거나 드래그해서 올려주세요</div>
+      <div class="sub">PNG / JPG / WEBP 지원</div>
+      <input type="file" id="fileInput" accept="image/*">
+    </div>
+    <div id="redactWrap" style="display:none;margin:14px 0">
+      <p style="font-size:12px;color:var(--ink-soft);margin-bottom:8px">📌 민감한 부분(계좌번호 등)을 <b>드래그해서 가려주세요.</b> 검은 박스로 가린 후 분석해요.</p>
+      <canvas id="redactCanvas" style="width:100%;border-radius:10px;border:1px solid var(--line);cursor:crosshair;touch-action:none;display:block"></canvas>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" id="undoRect" style="flex:1;font-size:12px;padding:7px">↩ 마지막 취소</button>
+        <button class="btn" id="clearRects" style="flex:1;font-size:12px;padding:7px">✕ 전체 지우기</button>
+      </div>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:8px">
+      <button class="btn" style="flex:1" id="uploadCancel">취소</button>
+      <button class="btn ai" style="flex:2" id="analyzeBtn" disabled>🤖 AI 분석 시작</button>
+    </div>
+  </div>
+</div>
+
+<!-- Preview / Confirm Modal -->
+<div class="overlay hidden" id="previewModal">
+  <div class="modal" style="max-width:540px">
+    <button class="modal-close" id="previewClose">✕</button>
+    <h3>✅ 분석 결과 확인</h3>
+    <p>AI가 읽은 종목이에요. 수정 후 추가하세요.</p>
+    <div class="error-box" id="previewError"></div>
+    <div class="parsed-list" id="parsedList"></div>
+    <button class="btn ghost" id="addParsedRow" style="border-style:dashed;width:100%;margin-bottom:16px">+ 항목 추가</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn" style="flex:1" id="previewCancel">취소</button>
+      <button class="btn accent" style="flex:2" id="confirmAdd">이 계좌에 추가</button>
+    </div>
+  </div>
+</div>
+
+<!-- Analysis Confirm Modal -->
+<div class="overlay hidden" id="confirmModal">
+  <div class="modal" style="max-width:380px;text-align:center">
+    <div style="font-size:36px;margin-bottom:12px">✨</div>
+    <h3 style="margin-bottom:8px">이 프로필로 분석할까요?</h3>
+    <div id="confirmProfileSummary" style="background:#f7f3ec;border-radius:12px;padding:14px 16px;margin:16px 0;text-align:left;font-size:13.5px;line-height:1.8"></div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn" style="flex:1" id="confirmModalCancel">취소</button>
+      <button class="btn accent" style="flex:2" id="confirmModalOk">분석 시작</button>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Modal -->
+<div class="overlay hidden" id="loadingModal">
+  <div class="modal" style="text-align:center;padding:40px 28px">
+    <div style="font-size:40px;margin-bottom:16px">🔍</div>
+    <h3 style="margin-bottom:10px">AI가 이미지를 분석 중이에요</h3>
+    <p style="margin-bottom:0">종목명·금액을 읽고 있어요. 잠시만요...</p>
+  </div>
+</div>
+
+<!-- Profile Modal -->
+<div class="overlay hidden" id="profileModal">
+  <div class="modal" style="max-width:460px">
+    <button class="modal-close" id="profileModalClose">✕</button>
+    <h3>👤 투자자 프로필</h3>
+    <p>AI 분석에 활용돼요. 한번만 입력하면 저장돼요.</p>
+    <div class="field">
+      <label>은퇴 시기</label>
+      <div class="radio-group" id="retireGroup">
+        <label class="radio-item"><input type="radio" name="retire" value="이미 은퇴함"> 이미 은퇴함</label>
+        <label class="radio-item"><input type="radio" name="retire" value="5년 이내"> 5년 이내</label>
+        <label class="radio-item"><input type="radio" name="retire" value="5~10년"> 5~10년</label>
+        <label class="radio-item"><input type="radio" name="retire" value="10~20년"> 10~20년</label>
+        <label class="radio-item"><input type="radio" name="retire" value="20년 이상"> 20년 이상</label>
+        <label class="radio-item"><input type="radio" name="retire" value="모름" checked> 모름</label>
+      </div>
+    </div>
+    <div class="field">
+      <label>투자 성향</label>
+      <div class="radio-group" id="styleGroup">
+        <label class="radio-item"><input type="radio" name="style" value="공격형" checked> 📈 공격형 <span style="font-size:11px;color:var(--ink-soft)">(변동성 감수, 수익 극대화)</span></label>
+        <label class="radio-item"><input type="radio" name="style" value="중립형"> ⚖️ 중립형 <span style="font-size:11px;color:var(--ink-soft)">(균형)</span></label>
+        <label class="radio-item"><input type="radio" name="style" value="안정형"> 🛡️ 안정형 <span style="font-size:11px;color:var(--ink-soft)">(원금 보전 우선)</span></label>
+      </div>
+    </div>
+    <div class="field">
+      <label>한줄 메모 <span style="font-weight:400;color:var(--ink-soft)">(선택)</span></label>
+      <input type="text" id="profileMemo" placeholder="예: 분양권 있음, 내집마련 목표, 자녀 학비 대비 중" style="width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14px;font-family:inherit">
+    </div>
+    <div style="margin-top:20px;display:flex;gap:8px">
+      <button class="btn" style="flex:1" id="profileCancel">취소</button>
+      <button class="btn accent" style="flex:2" id="profileSave">저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CATS={"미국지수":"#2563b8","반도체/AI":"#d4881f","한국주식":"#2f9e6e","채권":"#8a6dbf","현금성":"#9aa0a6"};
+const CAT_KEYS=Object.keys(CATS);
+const ACCT_COLORS=["#0f6b54","#c98a2b","#3a6ea5","#9d5ca8"];
+const DEFAULT_DATA={accounts:[
+  {name:"IRP",holdings:[{name:"나스닥100",amount:420,cat:"미국지수"},{name:"30년채권",amount:180,cat:"채권"}]},
+  {name:"연금저축",holdings:[{name:"S&P500",amount:1904,cat:"미국지수"},{name:"나스닥100",amount:476,cat:"미국지수"}]},
+  {name:"ISA",holdings:[{name:"ACE 엔비디아밸류체인액티브",amount:3150,cat:"반도체/AI"},{name:"CD금리형",amount:1050,cat:"현금성"}]},
+  {name:"일반계좌",holdings:[
+    {name:"삼성증권",amount:250,cat:"한국주식"},{name:"SK텔레콤",amount:150,cat:"한국주식"},
+    {name:"삼성생명",amount:77.6,cat:"한국주식"},{name:"현대모비스",amount:77.6,cat:"한국주식"},
+    {name:"삼양식품",amount:122,cat:"한국주식"},{name:"한화에어로스페이스",amount:117,cat:"한국주식"},
+    {name:"현금/CD금리형",amount:482.8,cat:"현금성"}]}
+]};
+const DATA_KEY="portfolio_data_v1",API_KEY_KEY="pflio_gemini_key";
+let data=JSON.parse(JSON.stringify(DEFAULT_DATA));
+let currentAI={acctIdx:null,parsedItems:[]};
+
+/* ── Storage ── */
+const mem={};
+const Store={
+  async get(k){
+    if(window.storage){try{const r=await window.storage.get(k,false);return r?r.value:null}catch{return null}}
+    try{return localStorage.getItem(k)}catch{return mem[k]??null}
+  },
+  async set(k,v){
+    if(window.storage){try{await window.storage.set(k,v,false);return}catch{}}
+    try{localStorage.setItem(k,v)}catch{mem[k]=v}
+  }
+};
+const isClaudeAI=()=>!!window.storage;
+
+/* ── Helpers ── */
+const fmt=n=>Math.round(n).toLocaleString("ko-KR");
+const fmt1=n=>(Math.round(n*10)/10).toLocaleString("ko-KR");
+const escH=s=>String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+async function save(){
+  await Store.set(DATA_KEY,JSON.stringify(data));
+  const t=document.getElementById("saveTag");
+  t.textContent="저장됨 ✓";t.style.opacity=".9";
+  clearTimeout(window._st);window._st=setTimeout(()=>{t.style.opacity=".7";t.textContent="자동 저장됨"},1200);
+}
+
+/* ── Totals ── */
+function totals(){
+  let total=0;const byCat={},byAcct=[];
+  CAT_KEYS.forEach(c=>byCat[c]=0);
+  data.accounts.forEach(a=>{
+    let at=0;a.holdings.forEach(h=>{const v=+h.amount||0;at+=v;byCat[h.cat]=(byCat[h.cat]||0)+v});
+    byAcct.push({name:a.name,total:at});total+=at;
+  });
+  return{total,byCat,byAcct};
+}
+function donutGradient(parts,total){
+  let acc=0,stops=[];
+  parts.forEach(p=>{const s=total?acc/total*360:0;acc+=p.value;const e=total?acc/total*360:0;stops.push(`${p.color} ${s}deg ${e}deg`)});
+  if(!stops.length)stops.push("#eee 0deg 360deg");
+  return`conic-gradient(${stops.join(",")})`;
+}
+function catSelect(val,ai,hi){
+  return`<select class="inp" data-a="${ai}" data-h="${hi}" data-f="cat">`+CAT_KEYS.map(c=>`<option ${c===val?"selected":""}>${c}</option>`).join("")+`</select>`;
+}
+
+/* ── Render ── */
+function render(){
+  const{total,byCat,byAcct}=totals();
+  document.getElementById("totalAmt").innerHTML=`${fmt(total)}<small>만 원</small>`;
+  const equity=byCat["미국지수"]+byCat["반도체/AI"]+byCat["한국주식"];
+  const safe=byCat["채권"]+byCat["현금성"];
+  const pct=v=>total?(v/total*100):0;
+  document.getElementById("summaryCards").innerHTML=`
+    <div class="card"><div class="k"><span class="dot" style="background:var(--c-kr)"></span>주식 비중</div><div class="v">${pct(equity).toFixed(1)}%</div><div class="sub">${fmt(equity)}만 원</div></div>
+    <div class="card"><div class="k"><span class="dot" style="background:var(--c-cash)"></span>안전자산(채권+현금)</div><div class="v">${pct(safe).toFixed(1)}%</div><div class="sub">${fmt(safe)}만 원</div></div>
+    <div class="card"><div class="k"><span class="dot" style="background:var(--c-semi)"></span>반도체/AI 단일테마</div><div class="v">${pct(byCat["반도체/AI"]).toFixed(1)}%</div><div class="sub">${fmt(byCat["반도체/AI"])}만 원</div></div>`;
+  const catParts=CAT_KEYS.filter(c=>byCat[c]>0).map(c=>({value:byCat[c],color:CATS[c]}));
+  document.getElementById("catDonut").style.background=donutGradient(catParts,total);
+  document.getElementById("catEquityPct").textContent=pct(equity).toFixed(0)+"%";
+  document.getElementById("catLegend").innerHTML=CAT_KEYS.filter(c=>byCat[c]>0).map(c=>`
+    <div class="leg-item"><span class="dot" style="background:${CATS[c]}"></span><span class="name">${c}</span><span class="amt">${fmt(byCat[c])}만</span><span class="pct">${pct(byCat[c]).toFixed(1)}%</span></div>`).join("");
+  const acctParts=byAcct.map((a,i)=>({value:a.total,color:ACCT_COLORS[i%ACCT_COLORS.length]}));
+  document.getElementById("acctDonut").style.background=donutGradient(acctParts,total);
+  document.getElementById("acctCount").textContent=data.accounts.length;
+  document.getElementById("acctLegend").innerHTML=byAcct.map((a,i)=>`
+    <div class="leg-item"><span class="dot" style="background:${ACCT_COLORS[i%ACCT_COLORS.length]}"></span><span class="name">${a.name}</span><span class="amt">${fmt(a.total)}만</span><span class="pct">${pct(a.total).toFixed(1)}%</span></div>`).join("");
+
+  const wrap=document.getElementById("accounts");
+  wrap.innerHTML="";
+  data.accounts.forEach((a,ai)=>{
+    const at=byAcct[ai].total;
+    const bar=a.holdings.filter(h=>(+h.amount||0)>0).map(h=>`<span style="width:${at?((+h.amount||0)/at*100):0}%;background:${CATS[h.cat]||'#ccc'}"></span>`).join("");
+    const rows=a.holdings.map((h,hi)=>`<tr>
+      <td><input class="inp" value="${escH(h.name)}" data-a="${ai}" data-h="${hi}" data-f="name"></td>
+      <td>${catSelect(h.cat,ai,hi)}</td>
+      <td class="r"><input class="inp num" type="number" step="0.1" value="${h.amount}" data-a="${ai}" data-h="${hi}" data-f="amount" style="width:110px"></td>
+      <td class="r"><span class="pct-cell">${at?((+h.amount||0)/at*100).toFixed(1):0}%</span></td>
+      <td class="r"><button class="del" data-a="${ai}" data-h="${hi}" data-act="delH" title="삭제">×</button></td></tr>`).join("");
+    const card=document.createElement("div");card.className="acct";
+    card.innerHTML=`
+      <div class="acct-head">
+        <div class="left"><input class="acct-name" value="${escH(a.name)}" data-a="${ai}" data-f="acctname"><span class="acct-total">${fmt1(at)}만 원 · ${pct(at).toFixed(1)}%</span></div>
+        <button class="del" data-a="${ai}" data-act="delA" style="font-size:13px;opacity:.5">계좌 삭제</button>
+      </div>
+      <div class="mini-bar">${bar}</div>
+      <table><thead><tr><th>종목</th><th>분류</th><th class="r">금액(만원)</th><th class="r">비중</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+      <div class="add-row">
+        <button class="btn ghost" data-a="${ai}" data-act="addH">+ 종목 추가</button>
+        <button class="btn ai" data-a="${ai}" data-act="aiAdd">✨ AI로 추가</button>
+      </div>`;
+    wrap.appendChild(card);
+  });
+}
+
+/* ── Delegated events ── */
+document.addEventListener("input",e=>{
+  const t=e.target,f=t.dataset.f;if(!f)return;
+  const ai=+t.dataset.a;
+  if(f==="acctname")data.accounts[ai].name=t.value;
+  else{const hi=+t.dataset.h,h=data.accounts[ai].holdings[hi];
+    if(f==="name")h.name=t.value;else if(f==="amount")h.amount=parseFloat(t.value)||0;else if(f==="cat")h.cat=t.value;}
+  scheduleRender();
+});
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-act]");if(!t)return;
+  const act=t.dataset.act,ai=+t.dataset.a;
+  if(act==="addH"){data.accounts[ai].holdings.push({name:"새 종목",amount:0,cat:"현금성"});render();save();}
+  else if(act==="delH"){data.accounts[ai].holdings.splice(+t.dataset.h,1);render();save();}
+  else if(act==="delA"){if(confirm("이 계좌를 삭제할까요?")){data.accounts.splice(ai,1);render();save();}}
+  else if(act==="aiAdd"){openAIModal(ai);}
+});
+document.getElementById("addAcct").onclick=()=>{data.accounts.push({name:"새 계좌",holdings:[{name:"현금",amount:0,cat:"현금성"}]});render();save();};
+document.getElementById("resetBtn").onclick=()=>{if(confirm("초기값으로 되돌릴까요?")){data=JSON.parse(JSON.stringify(DEFAULT_DATA));render();save();}};
+
+let _rt;
+function scheduleRender(){clearTimeout(_rt);_rt=setTimeout(()=>{
+  const active=document.activeElement;const sig=active?.dataset?`${active.dataset.a}-${active.dataset.h}-${active.dataset.f}`:null;const sel=active?.selectionStart;
+  render();
+  if(sig){const el=document.querySelector(`[data-a="${active?.dataset.a}"][data-h="${active?.dataset.h||''}"][data-f="${active?.dataset.f}"]`)||document.querySelector(`[data-a="${active?.dataset.a}"][data-f="${active?.dataset.f}"]`);if(el){el.focus();try{el.setSelectionRange(sel,sel)}catch{}}}
+  save();
+},350);}
+
+/* ══ AI FEATURE ══ */
+
+/* Key modal */
+async function openAIModal(acctIdx){
+  currentAI.acctIdx=acctIdx;
+  const name=data.accounts[acctIdx].name;
+  document.getElementById("uploadAcctName").textContent=`▸ ${name} 계좌에 추가`;
+  const keyBar=document.getElementById("keyStatusBar");
+  const k=await Store.get(API_KEY_KEY);
+  if(k){keyBar.innerHTML=`<div class="tag-key">🔑 Gemini API 키 저장됨 <button id="changeKey">변경</button></div>`;
+    document.getElementById("changeKey")?.addEventListener("click",()=>{document.getElementById("uploadModal").classList.add("hidden");document.getElementById("keyModal").classList.remove("hidden");});}
+  else{keyBar.innerHTML=`<div class="tag-key" style="background:#fef6e4;border-color:#f0d58e;color:#7a5a00">⚠️ Gemini API 키가 필요해요 <button id="goSetKey" style="color:#0f6b54">입력하기</button></div>`;
+    document.getElementById("goSetKey")?.addEventListener("click",()=>{document.getElementById("uploadModal").classList.add("hidden");document.getElementById("keyModal").classList.remove("hidden");});}
+  // reset upload state
+  document.getElementById("fileInput").value="";
+  document.getElementById("redactWrap").style.display="none";
+  redactRects=[];
+  imageReady=false;
+  document.getElementById("analyzeBtn").disabled=true;
+  document.getElementById("dropZone").querySelector(".main").textContent="이미지를 클릭하거나 드래그해서 올려주세요";
+  document.getElementById("uploadModal").classList.remove("hidden");
+}
+
+/* Key modal controls */
+document.getElementById("keyModalClose").onclick=document.getElementById("keyCancel").onclick=()=>document.getElementById("keyModal").classList.add("hidden");
+document.getElementById("keySave").onclick=async()=>{
+  const k=document.getElementById("keyInput").value.trim();
+  
+  document.getElementById("keyError").style.display="none";
+  await Store.set(API_KEY_KEY,k);
+  document.getElementById("keyModal").classList.add("hidden");
+  openAIModal(currentAI.acctIdx);
+};
+
+/* Upload modal */
+document.getElementById("uploadClose").onclick=document.getElementById("uploadCancel").onclick=()=>document.getElementById("uploadModal").classList.add("hidden");
+
+let selectedFile=null,selectedMime=null,imageReady=false;
+let redactRects=[],redactImg=new Image(),isDrawing=false,rectStart={x:0,y:0},rectCur={x:0,y:0};
+const cvs=()=>document.getElementById("redactCanvas");
+const ctx=()=>cvs().getContext("2d");
+
+document.getElementById("fileInput").addEventListener("change",e=>{handleFile(e.target.files[0])});
+const dz=document.getElementById("dropZone");
+dz.addEventListener("dragover",e=>{e.preventDefault();dz.classList.add("drag")});
+dz.addEventListener("dragleave",()=>dz.classList.remove("drag"));
+dz.addEventListener("drop",e=>{e.preventDefault();dz.classList.remove("drag");const f=e.dataTransfer.files[0];if(f)handleFile(f);});
+
+function handleFile(file){
+  if(!file||!file.type.startsWith("image/"))return;
+  selectedFile=file;selectedMime=file.type;imageReady=false;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    redactImg=new Image();
+    redactImg.onload=()=>{
+      const c=cvs();
+      const maxW=c.parentElement.clientWidth||440;
+      const scale=Math.min(1,maxW/redactImg.naturalWidth);
+      c.width=redactImg.naturalWidth*scale;
+      c.height=redactImg.naturalHeight*scale;
+      redactRects=[];imageReady=true;
+      drawCanvas();
+      document.getElementById("redactWrap").style.display="block";
+      dz.querySelector(".main").textContent=file.name;
+      document.getElementById("analyzeBtn").disabled=false;
+    };
+    redactImg.src=ev.target.result;
+  };reader.readAsDataURL(file);
+}
+
+function drawCanvas(){
+  if(!imageReady)return;
+  const c=cvs(),x=ctx();
+  x.drawImage(redactImg,0,0,c.width,c.height);
+  redactRects.forEach(r=>{x.fillStyle="#000";x.fillRect(r.x,r.y,r.w,r.h);});
+  if(isDrawing){
+    const w=rectCur.x-rectStart.x,h=rectCur.y-rectStart.y;
+    x.fillStyle="rgba(0,0,0,0.65)";x.fillRect(rectStart.x,rectStart.y,w,h);
+    x.strokeStyle="#fff";x.lineWidth=1.5;x.strokeRect(rectStart.x,rectStart.y,w,h);
+  }
+}
+
+function getCanvasPos(e){
+  const c=cvs(),r=c.getBoundingClientRect();
+  const clientX=e.touches?e.touches[0].clientX:e.clientX;
+  const clientY=e.touches?e.touches[0].clientY:e.clientY;
+  return{x:(clientX-r.left)*(c.width/r.width),y:(clientY-r.top)*(c.height/r.height)};
+}
+
+document.addEventListener("mousedown",e=>{if(e.target!==cvs())return;isDrawing=true;rectStart=getCanvasPos(e);rectCur={...rectStart};});
+document.addEventListener("mousemove",e=>{if(!isDrawing)return;rectCur=getCanvasPos(e);drawCanvas();});
+document.addEventListener("mouseup",e=>{
+  if(!isDrawing)return;isDrawing=false;
+  const w=rectCur.x-rectStart.x,h=rectCur.y-rectStart.y;
+  if(Math.abs(w)>5&&Math.abs(h)>5)redactRects.push({x:rectStart.x,y:rectStart.y,w,h});
+  drawCanvas();
+});
+cvs().addEventListener("touchstart",e=>{e.preventDefault();isDrawing=true;rectStart=getCanvasPos(e);rectCur={...rectStart};},{passive:false});
+cvs().addEventListener("touchmove",e=>{e.preventDefault();if(!isDrawing)return;rectCur=getCanvasPos(e);drawCanvas();},{passive:false});
+cvs().addEventListener("touchend",e=>{
+  e.preventDefault();if(!isDrawing)return;isDrawing=false;
+  const w=rectCur.x-rectStart.x,h=rectCur.y-rectStart.y;
+  if(Math.abs(w)>5&&Math.abs(h)>5)redactRects.push({x:rectStart.x,y:rectStart.y,w,h});
+  drawCanvas();
+},{passive:false});
+
+document.getElementById("undoRect").onclick=()=>{redactRects.pop();drawCanvas();};
+document.getElementById("clearRects").onclick=()=>{redactRects=[];drawCanvas();};
+
+function getRedactedB64(){
+  return cvs().toDataURL("image/jpeg",0.92).split(",")[1];
+}
+
+document.getElementById("analyzeBtn").onclick=async()=>{
+  if(!imageReady)return;
+  const apiKey=await Store.get(API_KEY_KEY);
+  if(!apiKey){openAIModal(currentAI.acctIdx);return;}
+  document.getElementById("uploadModal").classList.add("hidden");
+  document.getElementById("loadingModal").classList.remove("hidden");
+  try{
+    const result=await callGeminiVision(getRedactedB64(),"image/jpeg");
+    document.getElementById("loadingModal").classList.add("hidden");
+    showPreviewModal(result);
+  }catch(err){
+    document.getElementById("loadingModal").classList.add("hidden");
+    alert("분석 중 오류가 발생했어요: "+err.message);
+    openAIModal(currentAI.acctIdx);
+  }
+};
+
+async function callGeminiVision(b64,mime){
+  const key=await Store.get(API_KEY_KEY);
+  if(!key)throw new Error("API 키가 없어요");
+  const prompt=`이 이미지는 증권사 앱이나 포트폴리오 화면의 캡처입니다.
+이미지에서 종목명과 평가금액(보유금액)을 추출해서 아래 JSON 형식으로만 답하세요.
+다른 텍스트, 설명, 마크다운 없이 JSON만 출력하세요.
+
+cat 분류 기준 (반드시 아래 중 하나 선택):
+- 미국지수: S&P500, 나스닥, QQQ, VOO 등 미국 지수 추종 ETF
+- 반도체/AI: 엔비디아, 반도체, AI 관련 ETF·종목
+- 한국주식: 국내 개별 주식 (삼성전자, SK하이닉스 등)
+- 채권: 국채, 회사채, 채권 ETF
+- 현금성: 예금, 적금, MMF, CD, 현금, CMA
+
+금액 단위: 만원 (1,500,000원 → 150)
+
+{"holdings":[{"name":"종목명","amount":숫자,"cat":"카테고리"}]}`;
+
+  const resp=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent?key=${key}`,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      contents:[{parts:[
+        {inline_data:{mime_type:mime,data:b64}},
+        {text:prompt}
+      ]}],
+      generationConfig:{temperature:0,maxOutputTokens:1000}
+    })
+  });
+  if(!resp.ok){const e=await resp.json();throw new Error(e.error?.message||`HTTP ${resp.status}`);}
+  const d=await resp.json();
+  const raw=d.candidates?.[0]?.content?.parts?.[0]?.text||"";
+  const clean=raw.replace(/```json|```/g,"").trim();
+  const parsed=JSON.parse(clean);
+  if(!parsed.holdings)throw new Error("종목 데이터를 찾을 수 없어요");
+  return parsed.holdings;
+}
+
+/* Preview modal */
+function showPreviewModal(items){
+  currentAI.parsedItems=items.map(i=>({...i}));
+  renderParsedList();
+  document.getElementById("previewModal").classList.remove("hidden");
+}
+function renderParsedList(){
+  const list=document.getElementById("parsedList");
+  list.innerHTML=currentAI.parsedItems.map((item,i)=>`
+    <div class="parsed-item">
+      <input value="${escH(item.name)}" data-pi="${i}" data-pf="name" placeholder="종목명">
+      <select data-pi="${i}" data-pf="cat">${CAT_KEYS.map(c=>`<option ${c===item.cat?"selected":""}>${c}</option>`).join("")}</select>
+      <input class="pamt" type="number" step="0.1" value="${item.amount}" data-pi="${i}" data-pf="amount" style="width:90px">
+      <button class="pdel" data-pi="${i}">×</button>
+    </div>`).join("");
+  list.querySelectorAll("input,select").forEach(el=>{
+    el.addEventListener("input",()=>{const i=+el.dataset.pi,f=el.dataset.pf;
+      if(f==="name")currentAI.parsedItems[i].name=el.value;
+      else if(f==="amount")currentAI.parsedItems[i].amount=parseFloat(el.value)||0;
+      else if(f==="cat")currentAI.parsedItems[i].cat=el.value;});
+  });
+  list.querySelectorAll(".pdel").forEach(btn=>{
+    btn.onclick=()=>{currentAI.parsedItems.splice(+btn.dataset.pi,1);renderParsedList();};
+  });
+}
+document.getElementById("addParsedRow").onclick=()=>{currentAI.parsedItems.push({name:"새 종목",amount:0,cat:"현금성"});renderParsedList();};
+document.getElementById("previewClose").onclick=document.getElementById("previewCancel").onclick=()=>document.getElementById("previewModal").classList.add("hidden");
+document.getElementById("confirmAdd").onclick=()=>{
+  if(!currentAI.parsedItems.length){document.getElementById("previewError").textContent="추가할 항목이 없어요";document.getElementById("previewError").style.display="block";return;}
+  currentAI.parsedItems.forEach(item=>data.accounts[currentAI.acctIdx].holdings.push({...item}));
+  document.getElementById("previewModal").classList.add("hidden");
+  render();save();
+};
+
+/* ── User Profile ── */
+const PROFILE_KEY="portfolio_profile_v1";
+let userProfile={retire:"모름",style:"공격형",memo:""};
+
+async function loadProfile(){
+  const saved=await Store.get(PROFILE_KEY);
+  if(saved){try{userProfile=JSON.parse(saved)}catch{}}
+  renderProfileTag();
+}
+
+function renderProfileTag(){
+  const tag=document.getElementById("profileTag");
+  if(!userProfile||(!userProfile.retire&&!userProfile.style)){tag.style.display="none";return;}
+  tag.style.display="block";
+  tag.innerHTML=`<span style="font-size:12px;color:#0c4636;background:var(--accent-soft);border:1px solid #cde3d9;border-radius:8px;padding:6px 12px;display:inline-flex;gap:12px;flex-wrap:wrap">
+    <span>🕐 은퇴: <b>${userProfile.retire}</b></span>
+    <span>📊 성향: <b>${userProfile.style}</b></span>
+    ${userProfile.memo?`<span>📝 <b>${escH(userProfile.memo)}</b></span>`:""}
+  </span>`;
+}
+
+document.getElementById("profileBtn").onclick=async()=>{
+  // Pre-fill modal with saved values
+  const retire=document.querySelectorAll('input[name="retire"]');
+  retire.forEach(r=>{r.checked=(r.value===userProfile.retire)});
+  const style=document.querySelectorAll('input[name="style"]');
+  style.forEach(s=>{s.checked=(s.value===userProfile.style)});
+  document.getElementById("profileMemo").value=userProfile.memo||"";
+  document.getElementById("profileModal").classList.remove("hidden");
+};
+document.getElementById("profileModalClose").onclick=
+document.getElementById("profileCancel").onclick=()=>document.getElementById("profileModal").classList.add("hidden");
+document.getElementById("profileSave").onclick=async()=>{
+  const retire=document.querySelector('input[name="retire"]:checked')?.value||"모름";
+  const style=document.querySelector('input[name="style"]:checked')?.value||"중립형";
+  const memo=document.getElementById("profileMemo").value.trim();
+  userProfile={retire,style,memo};
+  await Store.set(PROFILE_KEY,JSON.stringify(userProfile));
+  document.getElementById("profileModal").classList.add("hidden");
+  renderProfileTag();
+};
+
+/* ── Portfolio AI Analysis ── */
+document.getElementById("analyzePortfolioBtn").onclick = analyzePortfolio;
+
+async function analyzePortfolio(){
+  const apiKey = await Store.get(API_KEY_KEY);
+  if(!apiKey){
+    document.getElementById("insight").innerHTML = `⚠️ AI 분석을 사용하려면 먼저 <b>✨ AI로 추가</b> 버튼에서 Gemini API 키를 등록해주세요.`;
+    return;
+  }
+  const retire = userProfile.retire||"모름";
+  const style = userProfile.style||"미설정";
+  const memo = userProfile.memo||"";
+  // Show custom confirm modal
+  document.getElementById("confirmProfileSummary").innerHTML =
+    `🕐 은퇴 시기: <b>${retire}</b><br>📊 투자 성향: <b>${style}</b>` +
+    (memo ? `<br>📝 메모: <b>${escH(memo)}</b>` : "");
+  document.getElementById("confirmModal").classList.remove("hidden");
+  // Wait for user choice
+  await new Promise(resolve => {
+    document.getElementById("confirmModalOk").onclick = () => {
+      document.getElementById("confirmModal").classList.add("hidden");
+      resolve(true);
+    };
+    document.getElementById("confirmModalCancel").onclick = () => {
+      document.getElementById("confirmModal").classList.add("hidden");
+      resolve(false);
+    };
+  }).then(ok => { if(!ok) throw new Error("cancelled"); });
+  const btn = document.getElementById("analyzePortfolioBtn");
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spin"></span>분석 중...`;
+  document.getElementById("insight").innerHTML = `🔍 포트폴리오를 분석하고 있어요...`;
+
+  try {
+    const {total, byCat, byAcct} = totals();
+    const pct = v => total ? (v/total*100).toFixed(1) : "0";
+    const acctLines = byAcct.map(a => `- ${a.name}: ${fmt(a.total)}만 원 (${total?(a.total/total*100).toFixed(1):0}%)`).join("\n");
+    const catLines = CAT_KEYS.filter(c=>byCat[c]>0).map(c => `- ${c}: ${fmt(byCat[c])}만 원 (${pct(byCat[c])}%)`).join("\n");
+    const holdLines = data.accounts.map(a => `${a.name}: ` + a.holdings.map(h=>`${h.name} ${fmt1(+h.amount)}만원(${h.cat})`).join(", ")).join("\n");
+    const summary = `총 자산: ${fmt(total)}만 원\n\n[계좌별]\n${acctLines}\n\n[자산 분류별]\n${catLines}\n\n[보유 종목]\n${holdLines}`;
+
+    const profileCtx = `은퇴 시기: ${userProfile.retire} / 투자 성향: ${userProfile.style}${userProfile.memo?" / 메모: "+userProfile.memo:""}`;
+    const prompt = `다음은 한국 투자자의 포트폴리오 현황입니다:
+
+${summary}
+
+[투자자 정보]
+${profileCtx}
+
+위 정보를 바탕으로 이 포트폴리오를 분석해서 한국어로 답해주세요. 친근하고 간결하게, 3~5문장 안에 핵심만 짚어주세요:
+1. 투자자 상황(은퇴 시기, 성향)에 비춰본 현재 포트폴리오의 특징/리스크
+2. 구체적인 개선 포인트 1가지
+마크다운 없이 일반 텍스트로만 답하세요.`;
+
+    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent?key=${apiKey}`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        contents: [{parts: [{text: prompt}]}],
+        generationConfig: {temperature: 0.7, maxOutputTokens: 500}
+      })
+    });
+    if(!resp.ok){const e=await resp.json();throw new Error(e.error?.message||`HTTP ${resp.status}`);}
+    const d = await resp.json();
+    const result = d.candidates?.[0]?.content?.parts?.[0]?.text || "분석 결과를 가져올 수 없어요.";
+    document.getElementById("insight").innerHTML = "💡 " + result.replace(/\n/g, "<br>");
+  } catch(err) {
+    if(err.message !== "cancelled"){
+      document.getElementById("insight").innerHTML = `❌ 분석 중 오류가 발생했어요: ${err.message}`;
+    }
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `✨ 다시 분석`;
+  }
+}
+
+/* Init */
+async function init(){
+  await loadProfile();
+  const saved=await Store.get(DATA_KEY);
+  if(saved){try{data=JSON.parse(saved)}catch{}}
+  render();
+}
+init();
+</script>
+</body>
+</html>
